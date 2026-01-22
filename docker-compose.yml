@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  # Backend Service
+  backend:
+    image: backend_image:latest  # Reference pre-built image, or use build: for creating new
+    # Uncomment below to build instead:
+    # build:
+    #   context: ./backend
+    #   dockerfile: Dockerfile
+    container_name: winonboard-backend
+    ports:
+      - "8080:8080"
+    environment:
+      - NODE_ENV=development
+      - PORT=8080
+      - SINGLE_SERVICE=false
+    env_file:
+      - ./backend/.env
+    restart: unless-stopped
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    command: npm run dev
+
+  # Frontend Service
+  frontend:
+    image: frontend_image:latest  # Reference pre-built image, or use build: for creating new
+    # Uncomment below to build instead:
+    # build:
+    #   context: ./frontend
+    #   dockerfile: Dockerfile
+    container_name: winonboard-frontend
+    ports:
+      - "80:80"
+    environment:
+      - REACT_APP_ENV=development
+    env_file:
+      - ./frontend/.env
+    depends_on:
+      - backend
+    restart: unless-stopped
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
