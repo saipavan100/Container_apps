@@ -1,0 +1,213 @@
+.hr-dashboard {
+  min-height: 100vh;
+  background: var(--bg-light);
+}
+
+.dashboard-header {
+  background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+  color: white;
+  padding: 20px 0;
+  box-shadow: var(--shadow-md);
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo-section {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+/* WinWire Logo Styles */
+.winwire-logo-small {
+  font-size: 0;
+  display: inline-block;
+  background: white;
+  padding: 8px 12px;
+  border-radius: 8px;
+}
+
+.logo-win-small,
+.logo-wire-small {
+  font-size: 24px;
+  font-weight: 700;
+  font-style: italic;
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+  vertical-align: top;
+}
+
+.logo-win-small {
+  color: #0066CC;
+}
+
+.logo-wire-small {
+  color: #DC3545;
+}
+
+.logo-circle-small {
+  width: 50px;
+  height: 50px;
+  background: white;
+  color: var(--primary-blue);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 20px;
+}
+
+.logo-section h1 {
+  font-size: 22px;
+  margin: 0;
+}
+
+.logo-section p {
+  font-size: 12px;
+  opacity: 0.9;
+  margin: 0;
+}
+
+.dashboard-content {
+  padding: 30px 15px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.stat-card {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: var(--shadow-md);
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  border-left: 4px solid;
+  transition: var(--transition);
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+.stat-card.stat-primary {
+  border-left-color: var(--primary-blue);
+}
+
+.stat-card.stat-success {
+  border-left-color: var(--success-green);
+}
+
+.stat-card.stat-warning {
+  border-left-color: var(--warning-yellow);
+}
+
+.stat-card.stat-info {
+  border-left-color: var(--primary-orange);
+}
+
+.stat-icon {
+  font-size: 32px;
+  color: var(--text-gray);
+}
+
+.stat-info h3 {
+  font-size: 28px;
+  margin: 0;
+  color: var(--text-black);
+}
+
+.stat-info p {
+  font-size: 13px;
+  color: var(--text-gray);
+  margin: 0;
+}
+
+.quick-actions {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: var(--shadow-md);
+  margin-bottom: 30px;
+}
+
+.quick-actions h2 {
+  font-size: 18px;
+  margin-bottom: 15px;
+  color: var(--text-black);
+}
+
+.action-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.candidates-section,
+.employees-section {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: var(--shadow-md);
+  margin-bottom: 30px;
+}
+
+.candidates-section h2,
+.employees-section h2 {
+  font-size: 18px;
+  margin-bottom: 15px;
+  color: var(--text-black);
+}
+
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+.btn-secondary {
+  background: white;
+  color: var(--primary-blue);
+  border: 1px solid white;
+}
+
+.btn-secondary:hover {
+  background: rgba(255,255,255,0.9);
+}
+
+.loading-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@media (max-width: 768px) {
+  .header-content {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+  }
+  
+  .action-buttons .btn {
+    width: 100%;
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "name": "winbuild-ignite",
+  "version": "1.0.0",
+  "description": "WinBuild Ignite - Employee Onboarding System (Single Service: Frontend + Backend)",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "cd backend && node server.js",
+    "build": "cd frontend && npm install --legacy-peer-deps && npm run build && cd ../backend && npm install --production",
+    "test": "echo \"No tests configured\""
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/winbuild-ignite.git"
+  },
+  "keywords": ["employee", "onboarding", "azure"],
+  "author": "WinWire",
+  "license": "ISC",
+  "comments": {
+    "deployment": "Single Service Mode (Frontend + Backend in One App Service)",
+    "azure_deployment_flow": [
+      "1. Azure reads .deployment file → finds: command = deploy.cmd",
+      "2. Azure runs: deploy.cmd",
+      "   ├─ cd frontend && npm install && npm run build",
+      "   └─ cd backend && npm install --production",
+      "3. Azure runs: npm start (from root package.json)",
+      "   └─ which runs: cd backend && node server.js",
+      "4. Backend server.js detects SINGLE_SERVICE=true env var",
+      "5. Backend serves pre-built React frontend from /frontend/build/",
+      "6. Backend handles ALL traffic: API + SPA routes"
+    ],
+    "important": "Only ONE process starts (backend). Frontend is pre-built during deploy.cmd",
+    ".deployment_file": "Tells Azure which deployment script to run (deploy.cmd)",
+    "npm_install_root": "Azure automatically runs npm install in root if package.json exists (default behavior)"
+  }
+}

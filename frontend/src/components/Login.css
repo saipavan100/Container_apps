@@ -1,0 +1,362 @@
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  background: #f8f9fa;
+  overflow: hidden;
+}
+
+/* Left Panel - Brand Section */
+.login-left-panel {
+  flex: 1;
+  background: linear-gradient(135deg, #1e5a9e 0%, #0d3d6b 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px;
+  position: relative;
+  overflow: hidden;
+}
+
+.login-left-panel::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+  animation: pulse 8s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 0.5; }
+  50% { transform: scale(1.1); opacity: 0.8; }
+}
+
+.brand-content {
+  max-width: 500px;
+  color: white;
+  z-index: 1;
+}
+
+.logo-circle {
+  display: flex;
+  margin-bottom: 30px;
+  width: fit-content;
+  gap: 0;
+  font-size: 0;
+}
+
+.logo-w-blue,
+.logo-w-red {
+  background: white;
+  padding: 10px 15px;
+  font-size: 48px;
+  font-weight: 700;
+  line-height: 1;
+  display: inline-block;
+  margin: 0;
+  vertical-align: middle;
+}
+
+.logo-w-blue {
+  color: #0066CC;
+  border-radius: 8px 0 0 8px;
+  padding: 10px 8px;
+}
+
+.logo-w-red {
+  color: #DC3545;
+  border-radius: 0 8px 8px 0;
+  padding: 10px 8px;
+  margin-left: -12px;
+}
+
+.brand-title {
+  font-size: 36px;
+  font-weight: 700;
+  margin-bottom: 15px;
+  line-height: 1.2;
+}
+
+.brand-subtitle {
+  font-size: 18px;
+  color: rgba(255,255,255,0.9);
+  margin-bottom: 40px;
+  line-height: 1.5;
+}
+
+.features-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  font-size: 16px;
+  color: rgba(255,255,255,0.95);
+}
+
+.feature-icon {
+  width: 24px;
+  height: 24px;
+  color: #4CAF50;
+}
+
+/* Right Panel - Login Form */
+.login-right-panel {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  background: white;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 450px;
+  animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.winwire-logo {
+  font-size: 0;
+  margin-bottom: 25px;
+  animation: float 3s ease-in-out infinite;
+}
+
+.winwire-logo .logo-win,
+.winwire-logo .logo-wire {
+  font-size: 48px;
+  font-weight: 700;
+  font-style: italic;
+  display: inline-block;
+}
+
+.winwire-logo-page {
+  font-size: 56px;
+  font-weight: 700;
+  font-style: italic;
+  margin-bottom: 30px;
+}
+
+.winwire-logo-small {
+  font-size: 32px;
+  font-weight: 700;
+  font-style: italic;
+  display: inline-block;
+  margin-right: 15px;
+}
+
+.logo-win, .logo-win-small {
+  color: #0066CC;
+}
+
+.logo-wire, .logo-wire-small {
+  color: #DC3545;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.login-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 10px;
+}
+
+.login-subtitle {
+  font-size: 15px;
+  color: #6c757d;
+}
+
+.login-form {
+  margin-bottom: 30px;
+}
+
+.login-form .form-group {
+  margin-bottom: 24px;
+}
+
+.login-form .form-label {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8px;
+  display: block;
+  font-size: 14px;
+}
+
+.login-form .form-control {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 15px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  background: #f8f9fa;
+}
+
+.login-form .form-control:focus {
+  outline: none;
+  border-color: #0066CC;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+}
+
+.login-form .btn-primary {
+  width: 100%;
+  padding: 14px;
+  font-size: 16px;
+  font-weight: 600;
+  background: linear-gradient(135deg, #0066CC 0%, #0052a3 100%);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 10px;
+  box-shadow: 0 4px 15px rgba(0, 102, 204, 0.3);
+}
+
+.login-form .btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 102, 204, 0.4);
+}
+
+.login-form .btn-primary:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.login-form .btn-primary:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.login-footer {
+  text-align: center;
+  border-top: 1px solid #e9ecef;
+  padding-top: 20px;
+}
+
+.footer-text {
+  font-size: 13px;
+  color: #6c757d;
+  margin-bottom: 8px;
+}
+
+.winwire-text {
+  font-weight: 600;
+}
+
+.text-blue {
+  color: #0066CC;
+}
+
+.text-red {
+  color: #DC3545;
+}
+
+.copyright-text {
+  font-size: 12px;
+  color: #adb5bd;
+  margin-top: 5px;
+}
+
+.spinner-small {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 8px;
+  animation: spin 0.8s linear infinite;
+  vertical-align: middle;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .login-left-panel {
+    padding: 40px;
+  }
+  
+  .brand-title {
+    font-size: 32px;
+  }
+}
+
+@media (max-width: 768px) {
+  .login-container {
+    flex-direction: column;
+  }
+  
+  .login-left-panel {
+    padding: 40px 20px;
+    min-height: 300px;
+  }
+  
+  .brand-title {
+    font-size: 28px;
+  }
+  
+  .brand-subtitle {
+    font-size: 16px;
+  }
+  
+  .features-list {
+    display: none;
+  }
+  
+  .login-right-panel {
+    padding: 30px 20px;
+  }
+  
+  .login-card {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .logo-circle {
+    font-size: 36px;
+  }
+  
+  .ww-badge {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .ww-text {
+    font-size: 28px;
+  }
+  
+  .login-title {
+    font-size: 24px;
+  }
+}
