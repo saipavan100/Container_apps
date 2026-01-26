@@ -4,7 +4,7 @@ import axios from 'axios';
 const getAPIURL = () => {
   // 1. Explicit environment variable override (highest priority)
   if (process.env.REACT_APP_API_URL) {
-    console.log('🔧 Using REACT_APP_API_URL from env');
+    console.log('🔧 Using REACT_APP_API_URL from env:', process.env.REACT_APP_API_URL);
     return process.env.REACT_APP_API_URL;
   }
   
