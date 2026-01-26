@@ -13,34 +13,47 @@ services:
       - NODE_ENV=production
       - PORT=8080
       - SINGLE_SERVICE=false
-      # VM IP address: 3.145.152.128
-      - ALLOWED_ORIGINS=http://3.145.152.128,http://3.145.152.128:80,http://3.145.152.128:3000,http://localhost:3000,http://127.0.0.1:3000,http://localhost,http://127.0.0.1
     env_file:
-      - ./backend/.env
-    restart: unless-stopped
+      - ./backend/.env.production
+    restart: always
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/api/health", "||", "exit", "1"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
+    networks:
+      - winonboard-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   # Frontend Service
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-      args:
-        - REACT_APP_API_URL=http://3.145.152.128:8080/api
     container_name: winonboard-frontend
     ports:
       - "80:80"
     environment:
       - REACT_APP_ENV=production
-      - REACT_APP_API_URL=http://3.145.152.128:8080/api
     env_file:
       - ./frontend/.env.production
     depends_on:
       backend:
         condition: service_healthy
-    restart: unless-stopped
+    restart: always
+    networks:
+      - winonboard-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  winonboard-network:
+    driver: bridge
