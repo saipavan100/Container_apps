@@ -64,6 +64,28 @@ if (!isSingleService) {
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
+// 🔥 DEBUG MIDDLEWARE - Log all incoming requests
+app.use((req, res, next) => {
+  console.log(`➡️ [${new Date().toISOString()}] ${req.method} ${req.url}`);
+  console.log('   Body:', req.body);
+  
+  // Log when response is sent
+  const originalJson = res.json;
+  const originalSend = res.send;
+  
+  res.json = function(data) {
+    console.log(`⬅️ [${new Date().toISOString()}] ${req.method} ${req.url} → JSON Response`);
+    return originalJson.call(this, data);
+  };
+  
+  res.send = function(data) {
+    console.log(`⬅️ [${new Date().toISOString()}] ${req.method} ${req.url} → Send Response`);
+    return originalSend.call(this, data);
+  };
+  
+  next();
+});
+
 // Serve static files (uploads, documents, assets)
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/documents', express.static(path.join(__dirname, 'documents')));
@@ -95,6 +117,12 @@ app.use('/api/learning', learningRoutes);
 // Health check
 app.get('/health', (req, res) => {
   res.json({ status: 'OK', message: 'Server is running' });
+});
+
+// 🧪 TEST ROUTE - Simple response without DB/logic
+app.post('/api/test', (req, res) => {
+  console.log('✅ /api/test route hit');
+  res.json({ ok: true, message: 'Test endpoint working' });
 });
 
 // Serve React build for single service deployment
