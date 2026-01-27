@@ -19,12 +19,23 @@ jobs:
       id-token: write
 
     steps:
+      # ----------------------------
+      # Checkout
+      # ----------------------------
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Docker Buildx
+      # ----------------------------
+      # Setup Buildx (IMPORTANT)
+      # ----------------------------
+      - name: Set up Docker Buildx (container driver)
         uses: docker/setup-buildx-action@v3
+        with:
+          driver: docker-container
 
+      # ----------------------------
+      # Login to Azure Container Registry
+      # ----------------------------
       - name: Log in to ACR
         uses: azure/docker-login@v1
         with:
@@ -32,6 +43,9 @@ jobs:
           username: ${{ secrets.ACR_USERNAME }}
           password: ${{ secrets.ACR_PASSWORD }}
 
+      # ----------------------------
+      # Build & Push Backend (with cache)
+      # ----------------------------
       - name: Build and push Backend image
         uses: docker/build-push-action@v5
         with:
@@ -39,12 +53,14 @@ jobs:
           file: ./backend/Dockerfile
           push: true
           tags: |
-            ${{ secrets.ACR_REGISTRY }}/${{ env.BACKEND_IMAGE }}:latest
-            ${{ secrets.ACR_REGISTRY }}/${{ env.BACKEND_IMAGE }}:${{ github.sha }}
+            ${{ secrets.ACR_REGISTRY }}/backend:latest
+            ${{ secrets.ACR_REGISTRY }}/backend:${{ github.sha }}
           cache-from: type=registry,ref=${{ secrets.ACR_REGISTRY }}/backend:buildcache
           cache-to: type=registry,ref=${{ secrets.ACR_REGISTRY }}/backend:buildcache,mode=max
 
-
+      # ----------------------------
+      # Build & Push Frontend (with cache)
+      # ----------------------------
       - name: Build and push Frontend image
         uses: docker/build-push-action@v5
         with:
@@ -52,13 +68,14 @@ jobs:
           file: ./frontend/Dockerfile
           push: true
           tags: |
-            ${{ secrets.ACR_REGISTRY }}/${{ env.FRONTEND_IMAGE }}:latest
-            ${{ secrets.ACR_REGISTRY }}/${{ env.FRONTEND_IMAGE }}:${{ github.sha }}
+            ${{ secrets.ACR_REGISTRY }}/frontend:latest
+            ${{ secrets.ACR_REGISTRY }}/frontend:${{ github.sha }}
           cache-from: type=registry,ref=${{ secrets.ACR_REGISTRY }}/frontend:buildcache
           cache-to: type=registry,ref=${{ secrets.ACR_REGISTRY }}/frontend:buildcache,mode=max
 
-
-
+      # ----------------------------
+      # Azure Login
+      # ----------------------------
       - name: Azure Login
         uses: azure/login@v1
         with:
@@ -66,6 +83,9 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
+      # ----------------------------
+      # Deploy Backend to Container Apps
+      # ----------------------------
       - name: Deploy Backend to Container Apps
         run: |
           az containerapp update \
@@ -76,6 +96,9 @@ jobs:
             --registry-username ${{ secrets.ACR_USERNAME }} \
             --registry-password ${{ secrets.ACR_PASSWORD }}
 
+      # ----------------------------
+      # Deploy Frontend to Container Apps
+      # ----------------------------
       - name: Deploy Frontend to Container Apps
         run: |
           az containerapp update \
@@ -86,6 +109,9 @@ jobs:
             --registry-username ${{ secrets.ACR_USERNAME }} \
             --registry-password ${{ secrets.ACR_PASSWORD }}
 
+      # ----------------------------
+      # Success Message
+      # ----------------------------
       - name: Deployment Success
         run: |
           echo "✅ Backend: ${{ secrets.ACR_REGISTRY }}/backend:${{ github.sha }}"
