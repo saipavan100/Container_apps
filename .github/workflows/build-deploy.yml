@@ -5,6 +5,10 @@ on:
     branches:
       - main
       - develop
+permissions:
+  id-token: write     # 🔥 REQUIRED for OIDC
+  contents: read
+
 
 env:
   ACR_REGISTRY: ${{ secrets.ACR_REGISTRY }}
