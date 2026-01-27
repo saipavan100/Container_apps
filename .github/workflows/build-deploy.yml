@@ -41,8 +41,8 @@ jobs:
           tags: |
             ${{ secrets.ACR_REGISTRY }}/${{ env.BACKEND_IMAGE }}:latest
             ${{ secrets.ACR_REGISTRY }}/${{ env.BACKEND_IMAGE }}:${{ github.sha }}
-          cache-from: type=registry,ref=${{ secrets.ACR_REGISTRY }}/${{ env.BACKEND_IMAGE }}:buildcache
-          cache-to: type=registry,ref=${{ secrets.ACR_REGISTRY }}/${{ env.BACKEND_IMAGE }}:buildcache,mode=max
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Build and push Frontend image
         uses: docker/build-push-action@v5
@@ -53,8 +53,8 @@ jobs:
           tags: |
             ${{ secrets.ACR_REGISTRY }}/${{ env.FRONTEND_IMAGE }}:latest
             ${{ secrets.ACR_REGISTRY }}/${{ env.FRONTEND_IMAGE }}:${{ github.sha }}
-          cache-from: type=registry,ref=${{ secrets.ACR_REGISTRY }}/${{ env.FRONTEND_IMAGE }}:buildcache
-          cache-to: type=registry,ref=${{ secrets.ACR_REGISTRY }}/${{ env.FRONTEND_IMAGE }}:buildcache,mode=max
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Azure Login
         uses: azure/login@v1
