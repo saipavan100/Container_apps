@@ -8,6 +8,7 @@ on:
 
 env:
   ACR_REGISTRY: ${{ secrets.ACR_REGISTRY }}
+  BUILDX_BUILDER: builder
 
 jobs:
   build-and-deploy:
@@ -17,15 +18,18 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # ✅ FORCE Buildx container driver
+      # ✅ Create container-based buildx
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
         with:
-          install: true
           driver: docker-container
+          buildkitd-flags: --allow-insecure-entitlement network.host
           use: true
+          driver-opts: |
+            image=moby/buildkit:buildx-stable-1
+          name: builder
 
-      - name: Docker info (debug)
+      - name: Verify buildx
         run: docker buildx ls
 
       - name: Login to ACR
@@ -35,10 +39,11 @@ jobs:
           username: ${{ secrets.ACR_USERNAME }}
           password: ${{ secrets.ACR_PASSWORD }}
 
-      # ✅ Backend build with cache
+      # ✅ Backend build (CACHE WORKS)
       - name: Build & Push Backend
         uses: docker/build-push-action@v5
         with:
+          builder: builder
           context: ./backend
           push: true
           tags: |
@@ -47,10 +52,11 @@ jobs:
           cache-from: type=registry,ref=${{ secrets.ACR_REGISTRY }}/backend:buildcache
           cache-to: type=registry,ref=${{ secrets.ACR_REGISTRY }}/backend:buildcache,mode=max
 
-      # ✅ Frontend build with cache
+      # ✅ Frontend build (CACHE WORKS)
       - name: Build & Push Frontend
         uses: docker/build-push-action@v5
         with:
+          builder: builder
           context: ./frontend
           push: true
           tags: |
