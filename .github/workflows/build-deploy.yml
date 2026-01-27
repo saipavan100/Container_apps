@@ -8,49 +8,38 @@ on:
 
 env:
   ACR_REGISTRY: ${{ secrets.ACR_REGISTRY }}
-  BACKEND_IMAGE: backend
-  FRONTEND_IMAGE: frontend
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write
 
     steps:
-      # ----------------------------
-      # Checkout
-      # ----------------------------
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # ----------------------------
-      # Setup Buildx (IMPORTANT)
-      # ----------------------------
-      - name: Set up Docker Buildx (container driver)
+      # ✅ FORCE Buildx container driver
+      - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
         with:
+          install: true
           driver: docker-container
+          use: true
 
-      # ----------------------------
-      # Login to Azure Container Registry
-      # ----------------------------
-      - name: Log in to ACR
+      - name: Docker info (debug)
+        run: docker buildx ls
+
+      - name: Login to ACR
         uses: azure/docker-login@v1
         with:
           login-server: ${{ secrets.ACR_REGISTRY }}
           username: ${{ secrets.ACR_USERNAME }}
           password: ${{ secrets.ACR_PASSWORD }}
 
-      # ----------------------------
-      # Build & Push Backend (with cache)
-      # ----------------------------
-      - name: Build and push Backend image
+      # ✅ Backend build with cache
+      - name: Build & Push Backend
         uses: docker/build-push-action@v5
         with:
           context: ./backend
-          file: ./backend/Dockerfile
           push: true
           tags: |
             ${{ secrets.ACR_REGISTRY }}/backend:latest
@@ -58,14 +47,11 @@ jobs:
           cache-from: type=registry,ref=${{ secrets.ACR_REGISTRY }}/backend:buildcache
           cache-to: type=registry,ref=${{ secrets.ACR_REGISTRY }}/backend:buildcache,mode=max
 
-      # ----------------------------
-      # Build & Push Frontend (with cache)
-      # ----------------------------
-      - name: Build and push Frontend image
+      # ✅ Frontend build with cache
+      - name: Build & Push Frontend
         uses: docker/build-push-action@v5
         with:
           context: ./frontend
-          file: ./frontend/Dockerfile
           push: true
           tags: |
             ${{ secrets.ACR_REGISTRY }}/frontend:latest
