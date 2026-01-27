@@ -24,9 +24,7 @@ const seedAdmin = require('./utils/seedAdmin');
 
 const app = express();
 
-const isSingleService = 
-  process.env.SINGLE_SERVICE === 'true' || 
-  process.env.NODE_ENV === 'production';
+const isSingleService = process.env.SINGLE_SERVICE === 'true';
 
 console.log(`🔍 Deployment Mode: ${isSingleService ? '🔗 SINGLE SERVICE (Frontend+Backend)' : '⚡ SEPARATE SERVICES'}`);
 
