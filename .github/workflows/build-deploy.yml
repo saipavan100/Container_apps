@@ -61,12 +61,7 @@ jobs:
             --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
             --query "properties.configuration.ingress.fqdn" -o tsv)
           echo "fqdn=$BACKEND_FQDN" >> $GITHUB_OUTPUT
-          echo "Backend FQDN: $BACKEND_FQDN"
-      
-      - name: Update nginx config with Backend FQDN
-        run: |
-          sed -i "s/BACKEND_FQDN/${{ steps.backend-fqdn.outputs.fqdn }}/g" ./frontend/nginx.container-apps.conf
-          cat ./frontend/nginx.container-apps.conf
+          echo "✅ Backend FQDN: https://$BACKEND_FQDN"
 
       - name: Build & Push Frontend Image
         uses: docker/build-push-action@v5
@@ -76,6 +71,7 @@ jobs:
           push: true
           build-args: |
             NGINX_CONFIG=nginx.container-apps.conf
+            REACT_APP_API_URL=https://${{ steps.backend-fqdn.outputs.fqdn }}/api
           tags: |
             ${{ secrets.ACR_REGISTRY }}/frontend:latest
             ${{ secrets.ACR_REGISTRY }}/frontend:${{ github.sha }}

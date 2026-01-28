@@ -133,7 +133,7 @@ const Login = () => {
 
         <div className="login-footer">
           <p className="footer-text">
-            🔒 Secure login powered by <span className="winwire-text"><span className="text-blue">Win</span><span className="text-red">Wire</span></span> Technologies
+            🔒 GVSP Secure login powered by <span className="winwire-text"><span className="text-blue">Win</span><span className="text-red">Wire</span></span> Technologies
           </p>
           <p className="copyright-text">© 2025 WinWire Technologies. All rights reserved.</p>
         </div>
