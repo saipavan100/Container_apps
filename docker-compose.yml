@@ -20,7 +20,7 @@ services:
     ports:
       - "80:80"
     env_file:
-      - ./frontend/.env.production
+      - ./frontend/.env
     depends_on:
       - backend
     restart: unless-stopped
