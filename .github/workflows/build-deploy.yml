@@ -42,26 +42,43 @@ jobs:
             ${{ secrets.ACR_REGISTRY }}/backend:latest
             ${{ secrets.ACR_REGISTRY }}/backend:${{ github.sha }}
 
-      # --------------------
-      # Build & Push Frontend
-      # --------------------
-      - name: Build & Push Frontend Image
-        uses: docker/build-push-action@v5
-        with:
-          context: ./frontend
-          file: ./frontend/Dockerfile
-          push: true
-          tags: |
-            ${{ secrets.ACR_REGISTRY }}/frontend:latest
-            ${{ secrets.ACR_REGISTRY }}/frontend:${{ github.sha }}
-
-      # Azure Login (SP / Managed Identity via secrets)
+      # Azure Login (needed to get backend FQDN)
       - name: Azure Login
         uses: azure/login@v1
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      # --------------------
+      # Build & Push Frontend
+      # --------------------
+      - name: Get Backend FQDN
+        id: backend-fqdn
+        run: |
+          BACKEND_FQDN=$(az containerapp show \
+            --name ${{ secrets.BACKEND_CONTAINER_APP_NAME }} \
+            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+            --query "properties.configuration.ingress.fqdn" -o tsv)
+          echo "fqdn=$BACKEND_FQDN" >> $GITHUB_OUTPUT
+          echo "Backend FQDN: $BACKEND_FQDN"
+      
+      - name: Update nginx config with Backend FQDN
+        run: |
+          sed -i "s/BACKEND_FQDN/${{ steps.backend-fqdn.outputs.fqdn }}/g" ./frontend/nginx.container-apps.conf
+          cat ./frontend/nginx.container-apps.conf
+
+      - name: Build & Push Frontend Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          file: ./frontend/Dockerfile
+          push: true
+          build-args: |
+            NGINX_CONFIG=nginx.container-apps.conf
+          tags: |
+            ${{ secrets.ACR_REGISTRY }}/frontend:latest
+            ${{ secrets.ACR_REGISTRY }}/frontend:${{ github.sha }}
 
       # Deploy Backend
       - name: Deploy Backend to Container Apps
