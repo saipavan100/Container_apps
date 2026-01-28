@@ -3,6 +3,11 @@
 .env.local
 .env.*.local
 
+# Deployment guides with secrets
+PORTAL_DEPLOYMENT.md
+MANUAL_DEPLOYMENT.md
+AZURE_DEPLOYMENT_GUIDE.md
+
 # Dependencies
 node_modules/
 package-lock.json
