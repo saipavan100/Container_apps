@@ -58,15 +58,16 @@ const sdk = new NodeSDK({
 });
 
 // Start the SDK
-sdk.start()
-  .then(() => {
-    console.log('✅ OpenTelemetry initialized');
-    console.log('📍 Service: winonboard-backend');
-    console.log('� Collector: ' + OTEL_COLLECTOR_URL);
-    console.log('📊 Sending: Metrics, Traces, and Logs via OTLP');
-    console.log('🔓 No vendor lock-in - data can be exported anywhere!');
-  })
-  .catch((error) => console.error('❌ OpenTelemetry initialization failed:', error));
+try {
+  sdk.start();
+  console.log('✅ OpenTelemetry initialized');
+  console.log('📍 Service: winonboard-backend');
+  console.log('🔗 Collector: ' + OTEL_COLLECTOR_URL);
+  console.log('📊 Sending: Metrics, Traces, and Logs via OTLP');
+  console.log('🔓 No vendor lock-in - data can be exported anywhere!');
+} catch (error) {
+  console.error('❌ OpenTelemetry initialization failed:', error);
+}
 
 // Graceful shutdown
 process.on('SIGTERM', () => {
