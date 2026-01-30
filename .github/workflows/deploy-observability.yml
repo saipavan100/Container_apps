@@ -3,6 +3,10 @@ name: Deploy Observability Stack
 on:
   workflow_dispatch:  # Manual trigger only
 
+permissions:
+  id-token: write
+  contents: read
+
 env:
   ACR_NAME: winonboard
   RESOURCE_GROUP: rg_pavan
