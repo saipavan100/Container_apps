@@ -6,6 +6,7 @@ const { OTLPLogExporter } = require('@opentelemetry/exporter-logs-otlp-http');
 const { Resource } = require('@opentelemetry/resources');
 const { SemanticResourceAttributes } = require('@opentelemetry/semantic-conventions');
 const { PeriodicExportingMetricReader } = require('@opentelemetry/sdk-metrics');
+const { BatchLogRecordProcessor } = require('@opentelemetry/sdk-logs');
 
 // OpenTelemetry Collector endpoint
 const OTEL_COLLECTOR_URL = process.env.OTEL_COLLECTOR_URL || 'http://winonboard-otel-collector.internal.gentlemeadow-8e12f1a7.westus2.azurecontainerapps.io:4318';
@@ -31,6 +32,9 @@ const metricReader = new PeriodicExportingMetricReader({
   exportIntervalMillis: 10000, // Export every 10 seconds
 });
 
+// Log processor
+const logProcessor = new BatchLogRecordProcessor(logExporter);
+
 // Initialize OpenTelemetry SDK
 const sdk = new NodeSDK({
   resource: new Resource({
@@ -42,7 +46,7 @@ const sdk = new NodeSDK({
   }),
   traceExporter,
   metricReader,
-  logRecordProcessor: logExporter,
+  logRecordProcessor: logProcessor,
   instrumentations: [
     getNodeAutoInstrumentations({
       // Disable specific instrumentations if needed
