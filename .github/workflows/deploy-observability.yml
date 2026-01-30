@@ -90,15 +90,16 @@ jobs:
 
       - name: Deploy OTEL Collector
         run: |
+          # Use the git SHA tag to force a new revision every time
           az containerapp update \
             --name winonboard-otel-collector \
             --resource-group ${{ env.RESOURCE_GROUP }} \
-            --image ${{ env.ACR_NAME }}.azurecr.io/otel-collector:latest || \
+            --image ${{ env.ACR_NAME }}.azurecr.io/otel-collector:${{ github.sha }} || \
           az containerapp create \
             --name winonboard-otel-collector \
             --resource-group ${{ env.RESOURCE_GROUP }} \
             --environment ${{ env.ENVIRONMENT }} \
-            --image ${{ env.ACR_NAME }}.azurecr.io/otel-collector:latest \
+            --image ${{ env.ACR_NAME }}.azurecr.io/otel-collector:${{ github.sha }} \
             --registry-server ${{ env.ACR_NAME }}.azurecr.io \
             --target-port 4318 \
             --ingress internal \
