@@ -74,6 +74,8 @@ jobs:
             --registry-server ${{ env.ACR_NAME }}.azurecr.io \
             --target-port 3100 \
             --ingress internal \
+            --min-replicas 1 \
+            --max-replicas 1 \
             --cpu 0.5 \
             --memory 1Gi
 
@@ -93,6 +95,8 @@ jobs:
             --registry-server ${{ env.ACR_NAME }}.azurecr.io \
             --target-port 4318 \
             --ingress internal \
+            --min-replicas 1 \
+            --max-replicas 1 \
             --cpu 0.5 \
             --memory 1Gi
 
@@ -112,6 +116,8 @@ jobs:
             --registry-server ${{ env.ACR_NAME }}.azurecr.io \
             --target-port 9090 \
             --ingress external \
+            --min-replicas 1 \
+            --max-replicas 1 \
             --cpu 0.5 \
             --memory 1Gi
 
