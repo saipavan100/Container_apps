@@ -1,6 +1,5 @@
 // Initialize OpenTelemetry FIRST (before any other imports)
-// Temporarily disabled for debugging
-// require('./tracing');
+require('./tracing');
 
 const express = require('express');
 const mongoose = require('mongoose');

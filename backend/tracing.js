@@ -49,9 +49,12 @@ const sdk = new NodeSDK({
   logRecordProcessor: logProcessor,
   instrumentations: [
     getNodeAutoInstrumentations({
-      // Disable specific instrumentations if needed
+      // Disable specific instrumentations that cause conflicts
       '@opentelemetry/instrumentation-fs': {
         enabled: false, // File system can be noisy
+      },
+      '@opentelemetry/instrumentation-mongodb': {
+        enabled: false, // Disabled due to MongoDB driver conflict
       },
     }),
   ],
