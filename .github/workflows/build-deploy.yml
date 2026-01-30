@@ -61,7 +61,7 @@ jobs:
             --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
             --query "properties.configuration.ingress.fqdn" -o tsv)
           echo "fqdn=$BACKEND_FQDN" >> $GITHUB_OUTPUT
-          echo "✅ Backend FQDN: https://$BACKEND_FQDN"
+          echo "✅ Backend FQDN retrieved successfully"
 
       - name: Build & Push Frontend Image
         uses: docker/build-push-action@v5

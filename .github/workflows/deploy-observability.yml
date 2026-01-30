@@ -131,15 +131,14 @@ jobs:
             --resource-group ${{ env.RESOURCE_GROUP }} \
             --set-env-vars "OTEL_COLLECTOR_URL=http://${{ steps.otel.outputs.fqdn }}:4318"
 
-      - name: Show Access URLs
+      - name: Deployment Complete
         run: |
-          PROMETHEUS_URL=$(az containerapp show --name winonboard-prometheus --resource-group ${{ env.RESOURCE_GROUP }} --query properties.configuration.ingress.fqdn -o tsv)
-          GRAFANA_URL=$(az containerapp show --name winonboard-grafana --resource-group ${{ env.RESOURCE_GROUP }} --query properties.configuration.ingress.fqdn -o tsv)
-          
           echo "=========================================="
-          echo "Observability Stack Deployed!"
+          echo "Observability Stack Deployed Successfully!"
           echo "=========================================="
-          echo "Prometheus: https://$PROMETHEUS_URL"
-          echo "Grafana:    https://$GRAFANA_URL"
           echo ""
-          echo "Grafana Login: admin / Admin@123"
+          echo "To access services, run these commands:"
+          echo "  az containerapp show --name winonboard-prometheus --resource-group ${{ env.RESOURCE_GROUP }} --query properties.configuration.ingress.fqdn -o tsv"
+          echo "  az containerapp show --name winonboard-grafana --resource-group ${{ env.RESOURCE_GROUP }} --query properties.configuration.ingress.fqdn -o tsv"
+          echo ""
+          echo "Note: Access URLs are not displayed in logs for security."
