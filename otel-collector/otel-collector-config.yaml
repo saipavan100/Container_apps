@@ -65,7 +65,7 @@ exporters:
 
   # Loki exporter for logs
   loki:
-    endpoint: http://winonboard-loki.internal.gentlemeadow-8e12f1a7.westus2.azurecontainerapps.io:3100/loki/api/v1/push
+    endpoint: http://:3100/loki/api/v1/push
     labels:
       resource:
         service.name: "service_name"
@@ -125,3 +125,4 @@ extensions:
   # zPages for debugging
   zpages:
     endpoint: 0.0.0.0:55679
+

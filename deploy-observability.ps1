@@ -1,4 +1,4 @@
-# ============================================================================
+﻿# ============================================================================
 # Deploy Complete Vendor-Neutral Observability Stack
 # ============================================================================
 # Components:
@@ -22,15 +22,15 @@ $ENVIRONMENT = "winonboard-env"
 $ACR_NAME = "winonboard"
 
 Write-Host ""
-Write-Host "╔════════════════════════════════════════════════════════════╗" -ForegroundColor Cyan
-Write-Host "║   Vendor-Neutral Observability Stack Deployment           ║" -ForegroundColor Cyan
-Write-Host "╚════════════════════════════════════════════════════════════╝" -ForegroundColor Cyan
+Write-Host "================================================================" -ForegroundColor Cyan
+Write-Host "   Vendor-Neutral Observability Stack Deployment" -ForegroundColor Cyan
+Write-Host "================================================================" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "Components to deploy:" -ForegroundColor White
-Write-Host "  ✓ Loki (log storage)               - Internal" -ForegroundColor Yellow
-Write-Host "  ✓ OpenTelemetry Collector          - Internal" -ForegroundColor Yellow
-Write-Host "  ✓ Prometheus (metrics)             - External" -ForegroundColor Yellow
-Write-Host "  ✓ Grafana (dashboards)             - External" -ForegroundColor Yellow
+Write-Host "  > Loki (log storage)               - Internal" -ForegroundColor Yellow
+Write-Host "  > OpenTelemetry Collector          - Internal" -ForegroundColor Yellow
+Write-Host "  > Prometheus (metrics)             - External" -ForegroundColor Yellow
+Write-Host "  > Grafana (dashboards)             - External" -ForegroundColor Yellow
 Write-Host ""
 Write-Host "Press any key to continue or Ctrl+C to cancel..." -ForegroundColor Gray
 $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
@@ -40,9 +40,9 @@ Write-Host ""
 # STEP 1: Build and Push Container Images
 # ============================================================================
 
-Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor Cyan
+Write-Host "================================================================" -ForegroundColor Cyan
 Write-Host "STEP 1/5: Building Container Images" -ForegroundColor Cyan
-Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor Cyan
+Write-Host "================================================================" -ForegroundColor Cyan
 Write-Host ""
 
 # Build Loki
@@ -50,30 +50,30 @@ Write-Host "[1/3] Building Loki image..." -ForegroundColor Yellow
 Push-Location loki
 az acr build --registry $ACR_NAME --image loki:v1 . --only-show-errors
 Pop-Location
-Write-Host "  ✓ loki:v1 built and pushed" -ForegroundColor Green
+Write-Host "  [OK] loki:v1 built and pushed" -ForegroundColor Green
 
 # Build OTEL Collector
 Write-Host "[2/3] Building OpenTelemetry Collector image..." -ForegroundColor Yellow
 Push-Location otel-collector
 az acr build --registry $ACR_NAME --image otel-collector:v1 . --only-show-errors
 Pop-Location
-Write-Host "  ✓ otel-collector:v1 built and pushed" -ForegroundColor Green
+Write-Host "  [OK] otel-collector:v1 built and pushed" -ForegroundColor Green
 
 # Build Prometheus
 Write-Host "[3/3] Building Prometheus image..." -ForegroundColor Yellow
 Push-Location prometheus
 az acr build --registry $ACR_NAME --image prometheus:v1 . --only-show-errors
 Pop-Location
-Write-Host "  ✓ prometheus:v1 built and pushed" -ForegroundColor Green
+Write-Host "  [OK] prometheus:v1 built and pushed" -ForegroundColor Green
 Write-Host ""
 
 # ============================================================================
 # STEP 2: Deploy Loki (Log Storage)
 # ============================================================================
 
-Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor Cyan
+Write-Host "================================================================" -ForegroundColor Cyan
 Write-Host "STEP 2/5: Deploying Loki" -ForegroundColor Cyan
-Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor Cyan
+Write-Host "================================================================" -ForegroundColor Cyan
 Write-Host ""
 
 az containerapp create `
@@ -93,7 +93,7 @@ $LOKI_FQDN = az containerapp show `
   --resource-group $RESOURCE_GROUP `
   --query properties.configuration.ingress.fqdn -o tsv
 
-Write-Host "  ✓ Loki deployed (internal)" -ForegroundColor Green
+Write-Host "  [OK] Loki deployed (internal)" -ForegroundColor Green
 Write-Host "    FQDN: $LOKI_FQDN" -ForegroundColor Gray
 Write-Host ""
 
@@ -101,9 +101,9 @@ Write-Host ""
 # STEP 3: Deploy OpenTelemetry Collector (Telemetry Pipeline)
 # ============================================================================
 
-Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor Cyan
+Write-Host "================================================================" -ForegroundColor Cyan
 Write-Host "STEP 3/5: Deploying OpenTelemetry Collector" -ForegroundColor Cyan
-Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor Cyan
+Write-Host "================================================================" -ForegroundColor Cyan
 Write-Host ""
 
 # Update OTEL config with actual Loki FQDN
@@ -136,7 +136,7 @@ $OTEL_FQDN = az containerapp show `
   --resource-group $RESOURCE_GROUP `
   --query properties.configuration.ingress.fqdn -o tsv
 
-Write-Host "  ✓ OTEL Collector deployed (internal)" -ForegroundColor Green
+Write-Host "  [OK] OTEL Collector deployed (internal)" -ForegroundColor Green
 Write-Host "    FQDN: $OTEL_FQDN" -ForegroundColor Gray
 Write-Host ""
 
@@ -144,9 +144,9 @@ Write-Host ""
 # STEP 4: Deploy Prometheus (Metrics Storage)
 # ============================================================================
 
-Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor Cyan
+Write-Host "================================================================" -ForegroundColor Cyan
 Write-Host "STEP 4/5: Deploying Prometheus" -ForegroundColor Cyan
-Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor Cyan
+Write-Host "================================================================" -ForegroundColor Cyan
 Write-Host ""
 
 # Update Prometheus config to scrape OTEL Collector
@@ -179,7 +179,7 @@ $PROMETHEUS_FQDN = az containerapp show `
   --resource-group $RESOURCE_GROUP `
   --query properties.configuration.ingress.fqdn -o tsv
 
-Write-Host "  ✓ Prometheus deployed (external)" -ForegroundColor Green
+Write-Host "  [OK] Prometheus deployed (external)" -ForegroundColor Green
 Write-Host "    URL: https://$PROMETHEUS_FQDN" -ForegroundColor Gray
 Write-Host ""
 
@@ -187,9 +187,9 @@ Write-Host ""
 # STEP 5: Deploy Grafana (Visualization)
 # ============================================================================
 
-Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor Cyan
+Write-Host "================================================================" -ForegroundColor Cyan
 Write-Host "STEP 5/5: Deploying Grafana" -ForegroundColor Cyan
-Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor Cyan
+Write-Host "================================================================" -ForegroundColor Cyan
 Write-Host ""
 
 az containerapp create `
@@ -209,7 +209,7 @@ $GRAFANA_FQDN = az containerapp show `
   --resource-group $RESOURCE_GROUP `
   --query properties.configuration.ingress.fqdn -o tsv
 
-Write-Host "  ✓ Grafana deployed (external)" -ForegroundColor Green
+Write-Host "  [OK] Grafana deployed (external)" -ForegroundColor Green
 Write-Host "    URL: https://$GRAFANA_FQDN" -ForegroundColor Gray
 Write-Host ""
 
@@ -217,9 +217,9 @@ Write-Host ""
 # STEP 6: Update Backend with OTEL Collector URL
 # ============================================================================
 
-Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor Cyan
+Write-Host "================================================================" -ForegroundColor Cyan
 Write-Host "Updating Backend Configuration" -ForegroundColor Cyan
-Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor Cyan
+Write-Host "================================================================" -ForegroundColor Cyan
 Write-Host ""
 
 az containerapp update `
@@ -228,22 +228,22 @@ az containerapp update `
   --set-env-vars "OTEL_COLLECTOR_URL=http://${OTEL_FQDN}:4318" `
   --only-show-errors | Out-Null
 
-Write-Host "  ✓ Backend configured to send telemetry to OTEL Collector" -ForegroundColor Green
+Write-Host "  [OK] Backend configured to send telemetry to OTEL Collector" -ForegroundColor Green
 Write-Host ""
 
 # ============================================================================
 # DEPLOYMENT SUMMARY
 # ============================================================================
 
-Write-Host "╔════════════════════════════════════════════════════════════╗" -ForegroundColor Green
-Write-Host "║          Observability Stack Deployed Successfully!       ║" -ForegroundColor Green
-Write-Host "╚════════════════════════════════════════════════════════════╝" -ForegroundColor Green
+Write-Host "================================================================════════════════════════════════════════════════════════════╗" -ForegroundColor Green
+Write-Host "|          Observability Stack Deployed Successfully!       |" -ForegroundColor Green
+Write-Host "================================================================════════════════════════════════════════════════════════════╝" -ForegroundColor Green
 Write-Host ""
 
 Write-Host "📊 Architecture:" -ForegroundColor Cyan
-Write-Host "  Backend → OTEL Collector → Loki (logs)" -ForegroundColor White
-Write-Host "                          → Prometheus (metrics)" -ForegroundColor White
-Write-Host "                          → All visible in Grafana" -ForegroundColor White
+Write-Host "  Backend -> OTEL Collector -> Loki (logs)" -ForegroundColor White
+Write-Host "                          -> Prometheus (metrics)" -ForegroundColor White
+Write-Host "                          -> All visible in Grafana" -ForegroundColor White
 Write-Host ""
 
 Write-Host "🌐 Access URLs:" -ForegroundColor Cyan
@@ -262,33 +262,34 @@ Write-Host "📋 Next Steps:" -ForegroundColor Cyan
 Write-Host "  1. Open Grafana: https://$GRAFANA_FQDN" -ForegroundColor White
 Write-Host ""
 Write-Host "  2. Add Prometheus Data Source:" -ForegroundColor White
-Write-Host "     • Configuration → Data Sources → Add data source" -ForegroundColor Gray
-Write-Host "     • Select 'Prometheus'" -ForegroundColor Gray
-Write-Host "     • URL: https://$PROMETHEUS_FQDN" -ForegroundColor Gray
-Write-Host "     • Save & Test" -ForegroundColor Gray
+Write-Host "     - Configuration -> Data Sources -> Add data source" -ForegroundColor Gray
+Write-Host "     - Select 'Prometheus'" -ForegroundColor Gray
+Write-Host "     - URL: https://$PROMETHEUS_FQDN" -ForegroundColor Gray
+Write-Host "     - Save `& Test" -ForegroundColor Gray
 Write-Host ""
 Write-Host "  3. Add Loki Data Source:" -ForegroundColor White
-Write-Host "     • Configuration → Data Sources → Add data source" -ForegroundColor Gray
-Write-Host "     • Select 'Loki'" -ForegroundColor Gray
-Write-Host "     • URL: http://$LOKI_FQDN" -ForegroundColor Gray
-Write-Host "     • Save & Test" -ForegroundColor Gray
+Write-Host "     - Configuration -> Data Sources -> Add data source" -ForegroundColor Gray
+Write-Host "     - Select 'Loki'" -ForegroundColor Gray
+Write-Host "     - URL: http://$LOKI_FQDN" -ForegroundColor Gray
+Write-Host "     - Save `& Test" -ForegroundColor Gray
 Write-Host ""
 Write-Host "  4. Import Dashboards (optional):" -ForegroundColor White
-Write-Host "     • Node.js App:    ID 11159" -ForegroundColor Gray
-Write-Host "     • Express.js:     ID 6417" -ForegroundColor Gray
-Write-Host "     • Node Exporter:  ID 1860" -ForegroundColor Gray
+Write-Host "     - Node.js App:    ID 11159" -ForegroundColor Gray
+Write-Host "     - Express.js:     ID 6417" -ForegroundColor Gray
+Write-Host "     - Node Exporter:  ID 1860" -ForegroundColor Gray
 Write-Host ""
 
 Write-Host "✨ Benefits:" -ForegroundColor Cyan
-Write-Host "  ✓ No vendor lock-in - all open-source tools" -ForegroundColor Green
-Write-Host "  ✓ Backend sends data via standard OTLP protocol" -ForegroundColor Green
-Write-Host "  ✓ Change monitoring tools without changing app code" -ForegroundColor Green
-Write-Host "  ✓ Centralized telemetry processing in OTEL Collector" -ForegroundColor Green
+Write-Host "  [OK] No vendor lock-in - all open-source tools" -ForegroundColor Green
+Write-Host "  [OK] Backend sends data via standard OTLP protocol" -ForegroundColor Green
+Write-Host "  [OK] Change monitoring tools without changing app code" -ForegroundColor Green
+Write-Host "  [OK] Centralized telemetry processing in OTEL Collector" -ForegroundColor Green
 Write-Host ""
 
 Write-Host "📖 Documentation:" -ForegroundColor Cyan
-Write-Host "  • Architecture:        VENDOR_NEUTRAL_ARCHITECTURE.md" -ForegroundColor Gray
-Write-Host "  • Setup Guide:         OBSERVABILITY_SETUP.md" -ForegroundColor Gray
-Write-Host "  • Log Explanation:     LOGS_EXPLAINED.md" -ForegroundColor Gray
+Write-Host "  - Architecture:        VENDOR_NEUTRAL_ARCHITECTURE.md" -ForegroundColor Gray
+Write-Host "  - Setup Guide:         OBSERVABILITY_SETUP.md" -ForegroundColor Gray
+Write-Host "  - Log Explanation:     LOGS_EXPLAINED.md" -ForegroundColor Gray
 Write-Host ""
 Write-Host "════════════════════════════════════════════════════════════" -ForegroundColor Gray
+

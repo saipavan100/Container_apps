@@ -1,0 +1,145 @@
+name: Deploy Observability Stack
+
+on:
+  workflow_dispatch:  # Manual trigger only
+
+env:
+  ACR_NAME: winonboard
+  RESOURCE_GROUP: rg_pavan
+  ENVIRONMENT: winonboard-env
+
+jobs:
+  build-observability-images:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Login to ACR
+        run: |
+          az acr login --name ${{ env.ACR_NAME }}
+
+      - name: Build and Push Loki
+        uses: docker/build-push-action@v5
+        with:
+          context: ./loki
+          push: true
+          tags: ${{ env.ACR_NAME }}.azurecr.io/loki:v1
+
+      - name: Build and Push OTEL Collector
+        uses: docker/build-push-action@v5
+        with:
+          context: ./otel-collector
+          push: true
+          tags: ${{ env.ACR_NAME }}.azurecr.io/otel-collector:v1
+
+      - name: Build and Push Prometheus
+        uses: docker/build-push-action@v5
+        with:
+          context: ./prometheus
+          push: true
+          tags: ${{ env.ACR_NAME }}.azurecr.io/prometheus:v1
+
+  deploy-observability:
+    needs: build-observability-images
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Deploy Loki
+        run: |
+          az containerapp create \
+            --name winonboard-loki \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --environment ${{ env.ENVIRONMENT }} \
+            --image ${{ env.ACR_NAME }}.azurecr.io/loki:v1 \
+            --registry-server ${{ env.ACR_NAME }}.azurecr.io \
+            --target-port 3100 \
+            --ingress internal \
+            --cpu 0.5 \
+            --memory 1Gi
+
+      - name: Get Loki FQDN
+        id: loki
+        run: |
+          LOKI_FQDN=$(az containerapp show --name winonboard-loki --resource-group ${{ env.RESOURCE_GROUP }} --query properties.configuration.ingress.fqdn -o tsv)
+          echo "fqdn=$LOKI_FQDN" >> $GITHUB_OUTPUT
+
+      - name: Deploy OTEL Collector
+        run: |
+          az containerapp create \
+            --name winonboard-otel-collector \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --environment ${{ env.ENVIRONMENT }} \
+            --image ${{ env.ACR_NAME }}.azurecr.io/otel-collector:v1 \
+            --registry-server ${{ env.ACR_NAME }}.azurecr.io \
+            --target-port 4318 \
+            --ingress internal \
+            --cpu 0.5 \
+            --memory 1Gi
+
+      - name: Get OTEL Collector FQDN
+        id: otel
+        run: |
+          OTEL_FQDN=$(az containerapp show --name winonboard-otel-collector --resource-group ${{ env.RESOURCE_GROUP }} --query properties.configuration.ingress.fqdn -o tsv)
+          echo "fqdn=$OTEL_FQDN" >> $GITHUB_OUTPUT
+
+      - name: Deploy Prometheus
+        run: |
+          az containerapp create \
+            --name winonboard-prometheus \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --environment ${{ env.ENVIRONMENT }} \
+            --image ${{ env.ACR_NAME }}.azurecr.io/prometheus:v1 \
+            --registry-server ${{ env.ACR_NAME }}.azurecr.io \
+            --target-port 9090 \
+            --ingress external \
+            --cpu 0.5 \
+            --memory 1Gi
+
+      - name: Deploy Grafana
+        run: |
+          az containerapp create \
+            --name winonboard-grafana \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --environment ${{ env.ENVIRONMENT }} \
+            --image grafana/grafana:10.2.3 \
+            --target-port 3000 \
+            --ingress external \
+            --cpu 0.5 \
+            --memory 1Gi \
+            --env-vars "GF_SECURITY_ADMIN_PASSWORD=Admin@123" "GF_INSTALL_PLUGINS=grafana-piechart-panel"
+
+      - name: Update Backend with OTEL Collector URL
+        run: |
+          az containerapp update \
+            --name winonboard-backend \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --set-env-vars "OTEL_COLLECTOR_URL=http://${{ steps.otel.outputs.fqdn }}:4318"
+
+      - name: Show Access URLs
+        run: |
+          PROMETHEUS_URL=$(az containerapp show --name winonboard-prometheus --resource-group ${{ env.RESOURCE_GROUP }} --query properties.configuration.ingress.fqdn -o tsv)
+          GRAFANA_URL=$(az containerapp show --name winonboard-grafana --resource-group ${{ env.RESOURCE_GROUP }} --query properties.configuration.ingress.fqdn -o tsv)
+          
+          echo "=========================================="
+          echo "Observability Stack Deployed!"
+          echo "=========================================="
+          echo "Prometheus: https://$PROMETHEUS_URL"
+          echo "Grafana:    https://$GRAFANA_URL"
+          echo ""
+          echo "Grafana Login: admin / Admin@123"

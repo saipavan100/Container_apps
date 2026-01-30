@@ -9,13 +9,13 @@ scrape_configs:
   # Backend application metrics
   - job_name: 'winonboard-backend'
     static_configs:
-      - targets: ['winonboard-backend.internal.gentlemeadow-8e12f1a7.westus2.azurecontainerapps.io:9464']
+      - targets: [':9464']
         labels:
           service: 'backend'
           app: 'winonboard'
     
     # For external ingress, use the external FQDN
-    # - targets: ['winonboard-backend.gentlemeadow-8e12f1a7.westus2.azurecontainerapps.io:9464']
+    # - targets: [':9464']
 
   # Prometheus self-monitoring
   - job_name: 'prometheus'
@@ -23,3 +23,4 @@ scrape_configs:
       - targets: ['localhost:9090']
         labels:
           service: 'prometheus'
+
