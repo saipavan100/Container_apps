@@ -1,0 +1,127 @@
+# OpenTelemetry Collector Configuration
+# Receives metrics, traces, and logs from backend
+# Exports to Prometheus, Jaeger, and Loki
+
+receivers:
+  # OTLP receiver for all signals (metrics, traces, logs)
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+  # Prometheus receiver to scrape collector's own metrics
+  prometheus:
+    config:
+      scrape_configs:
+        - job_name: 'otel-collector'
+          scrape_interval: 10s
+          static_configs:
+            - targets: ['localhost:8888']
+
+processors:
+  # Batch processor - improves performance by batching telemetry
+  batch:
+    timeout: 10s
+    send_batch_size: 1024
+
+  # Memory limiter - prevents OOM errors
+  memory_limiter:
+    check_interval: 1s
+    limit_mib: 512
+    spike_limit_mib: 128
+
+  # Resource processor - add custom attributes
+  resource:
+    attributes:
+      - key: deployment.environment
+        value: production
+        action: upsert
+      - key: service.namespace
+        value: winonboard
+        action: upsert
+
+  # Attributes processor - modify span/log attributes
+  attributes:
+    actions:
+      - key: cluster
+        value: azure-container-apps
+        action: insert
+
+exporters:
+  # Prometheus exporter - exposes metrics on /metrics endpoint
+  prometheus:
+    endpoint: "0.0.0.0:9464"
+    namespace: winonboard
+    const_labels:
+      environment: production
+
+  # OTLP exporter for traces (to Jaeger or Tempo)
+  otlp/jaeger:
+    endpoint: winonboard-jaeger.internal.gentlemeadow-8e12f1a7.westus2.azurecontainerapps.io:4317
+    tls:
+      insecure: true
+
+  # Loki exporter for logs
+  loki:
+    endpoint: http://winonboard-loki.internal.gentlemeadow-8e12f1a7.westus2.azurecontainerapps.io:3100/loki/api/v1/push
+    labels:
+      resource:
+        service.name: "service_name"
+        service.namespace: "service_namespace"
+      attributes:
+        severity: "severity"
+        http.method: "http_method"
+
+  # Logging exporter - debug output to collector logs
+  logging:
+    loglevel: info
+
+  # File exporter - backup to local files (optional)
+  file:
+    path: /tmp/otel-data.json
+
+service:
+  # Pipeline for metrics
+  pipelines:
+    metrics:
+      receivers: [otlp, prometheus]
+      processors: [memory_limiter, batch, resource, attributes]
+      exporters: [prometheus, logging]
+
+    # Pipeline for traces
+    traces:
+      receivers: [otlp]
+      processors: [memory_limiter, batch, resource, attributes]
+      exporters: [otlp/jaeger, logging]
+
+    # Pipeline for logs
+    logs:
+      receivers: [otlp]
+      processors: [memory_limiter, batch, resource, attributes]
+      exporters: [loki, logging]
+
+  # Telemetry configuration for the collector itself
+  telemetry:
+    logs:
+      level: info
+    metrics:
+      level: detailed
+      address: 0.0.0.0:8888
+
+  # Extensions
+  extensions: [health_check, pprof, zpages]
+
+extensions:
+  # Health check endpoint
+  health_check:
+    endpoint: 0.0.0.0:13133
+
+  # Performance profiling
+  pprof:
+    endpoint: 0.0.0.0:1777
+
+  # zPages for debugging
+  zpages:
+    endpoint: 0.0.0.0:55679

@@ -1,3 +1,6 @@
+// Initialize OpenTelemetry FIRST (before any other imports)
+require('./tracing');
+
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
