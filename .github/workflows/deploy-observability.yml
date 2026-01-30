@@ -43,7 +43,10 @@ jobs:
         with:
           context: ./otel-collector
           push: true
-          tags: ${{ env.ACR_NAME }}.azurecr.io/otel-collector:v1
+          tags: |
+            ${{ env.ACR_NAME }}.azurecr.io/otel-collector:v1
+            ${{ env.ACR_NAME }}.azurecr.io/otel-collector:latest
+            ${{ env.ACR_NAME }}.azurecr.io/otel-collector:${{ github.sha }}
 
       - name: Build and Push Prometheus
         uses: docker/build-push-action@v5
@@ -87,11 +90,15 @@ jobs:
 
       - name: Deploy OTEL Collector
         run: |
+          az containerapp update \
+            --name winonboard-otel-collector \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --image ${{ env.ACR_NAME }}.azurecr.io/otel-collector:latest || \
           az containerapp create \
             --name winonboard-otel-collector \
             --resource-group ${{ env.RESOURCE_GROUP }} \
             --environment ${{ env.ENVIRONMENT }} \
-            --image ${{ env.ACR_NAME }}.azurecr.io/otel-collector:v1 \
+            --image ${{ env.ACR_NAME }}.azurecr.io/otel-collector:latest \
             --registry-server ${{ env.ACR_NAME }}.azurecr.io \
             --target-port 4318 \
             --ingress internal \
