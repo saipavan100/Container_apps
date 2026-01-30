@@ -68,8 +68,7 @@ exporters:
 
   # Logging exporter - debug output to collector logs  
   logging:
-    loglevel: info
-    path: /tmp/otel-data.json
+    verbosity: detailed
 
 service:
   # Pipeline for metrics
