@@ -6,10 +6,10 @@ global:
     environment: 'production'
 
 scrape_configs:
-  # Backend application metrics
+  # Backend application metrics via OTEL Collector
   - job_name: 'winonboard-backend'
     static_configs:
-      - targets: [':9464']
+      - targets: ['winonboard-otel-collector.internal.gentlemeadow-8e12f1a7.westus2.azurecontainerapps.io:9464']
         labels:
           service: 'backend'
           app: 'winonboard'
